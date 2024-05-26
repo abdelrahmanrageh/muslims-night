@@ -59,23 +59,31 @@ type Data = {
     date: string | null,
     nightDuration: number | null
 }
-export default function NightDetails({ city , data }: { city: (string | null) , data: (Data | null)}) {
+export default function NightDetails({ city , data , twelveHour}: { city: (string | null) , data: (Data | null), twelveHour: boolean} ) {
     const [fajrTime, setFajrTime] = useState<string | null>(null);
     const [maghripTime, setMaghripTime] = useState<string | null>(null);
     const [lastThirdNight, setLastThirdNight] = useState<string | null>(null);
-    const [date] = useState<string | null>(null);
+    const [date , setDate ] = useState<Date >(new Date());
     const [weekDay, setWeekDay] = useState<string | null>(null);
     const [day, setDay] = useState<string | null>(null);
     const [month, setMonth] = useState<string | null>(null);
     const [year, setYear] = useState<string | null>(null);
     const [nightDuration, setNightDuration] = useState<number | null>(null);
     const minsDuration: (number | null) = nightDuration ? (nightDuration - Math.floor(nightDuration)) * 60 : null;
+    const [fajrDate, setFajrDate] = useState<string | null>(null);
+    const [maghripDate, setMaghripDate] = useState<string | null>(null);
+    
+
+    useEffect(() => {
+        setDate(new Date());
+    }, [])
 
     //getting the prayer times from the api
     useEffect(() => {
+        const apiDate = `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
         if (city) {
             const getPrayerTimes = async (): Promise<PrayerTimes> => {
-                const url = `https://api.aladhan.com/v1/timingsByCity/${date}?city=${city}&country=EG&method=5`;
+                const url = `https://api.aladhan.com/v1/timingsByCity/${apiDate}?city=${city}&country=EG&method=5`;
                 const res = await fetch(url);
                 const data = await res.json();
                 return data;
@@ -99,19 +107,28 @@ export default function NightDetails({ city , data }: { city: (string | null) , 
 
     //calculating the last third of the night
     useEffect(() => {
-        const date = new Date();
+        const now: Date = date;
+        
         if (fajrTime && maghripTime) {
-            const a = date.setHours(parseInt(fajrTime.slice(0, 2)), parseInt(fajrTime.slice(3, 5)), 0, 0);
-            const b = date.setHours(parseInt(maghripTime.slice(0, 2)), parseInt(maghripTime.slice(3, 5)), 0, 0);
+            //fajr time
+            const a = now.setHours(parseInt(fajrTime.slice(0, 2)), parseInt(fajrTime.slice(3, 5)), 0, 0);
+            setFajrDate(new Date(a).toLocaleTimeString(undefined, { hour12: twelveHour, hour: 'numeric', minute: '2-digit' }));
+            
+            //maghrip time
+            const b = now.setHours(parseInt(maghripTime.slice(0, 2)), parseInt(maghripTime.slice(3, 5)), 0, 0);
+            setMaghripDate(new Date(b).toLocaleTimeString(undefined, { hour12: twelveHour, hour: 'numeric', minute: '2-digit'  }));
+
+            //calculating the difference between fajr and maghrip
             const diff = Math.abs(a - b);
             const hourDiff = 24 - (diff / (1000 * 60 * 60));
             setNightDuration(hourDiff);
-            setLastThirdNight(new Date(a - ((hourDiff / 3) * 1000 * 60 * 60)).toLocaleTimeString());
+            setLastThirdNight(new Date(a - ((hourDiff / 3) * 1000 * 60 * 60)).toLocaleTimeString(undefined, { hour12: twelveHour, hour: '2-digit', minute: '2-digit', second: '2-digit' }));
         }
 
-    }, [fajrTime, maghripTime])
+    }, [fajrTime, maghripTime, date , twelveHour])
     return (
         <>
+            
             <h2 className='sm:text-2xl mt-2 font-normal  m-auto text-right w-full text-navy'>{weekDay } {day} {month} {year}</h2>
             <h1 className="mb-1 mt-20  text-5xl font-extrabold leading-none tracking-tight text-navy md:text-5xl lg:text-6xl ">
                 الثلث الأخير من الليل:
@@ -120,23 +137,25 @@ export default function NightDetails({ city , data }: { city: (string | null) , 
                 {lastThirdNight}
             </h1>
 
-            <h1 className='text-3xl mt-20 mb-5 text-navy'></h1>
-            <h2 className='text-2xl sm:inline mx-5 font-normal text-navy'>صلاة الفجر: {fajrTime}</h2>
-            <h2 className='text-2xl sm:inline mx-5 font-normal text-navy'>صلاة المغرب: {maghripTime}</h2>
-            <h2 className='text-2xl w-full sm:inline mx-auto sm:mx-5 font-normal text-navy'>
-            طول الليلة: {
-                nightDuration && Math.floor(nightDuration) 
-                    + 
+            <h2  className='text-2xl lg:inline-block lg:mx-5 font-normal mt-14 text-navy '>صلاة الفجر: <span dir="ltr" className=""> {fajrDate}</span></h2>
+            <h2  className='text-2xl lg:inline lg:mx-5 font-normal text-navy '>صلاة المغرب: <span dir="ltr"> {maghripDate}</span></h2>
+            <h2 className='text-2xl w-full lg:inline mx-auto lg:mx-5 font-normal text-navy'>
+            طول الليلة:  
+                <span>
+                {
+                    nightDuration && ' ' + Math.floor(nightDuration) 
+                    +   
                     (
                         (nightDuration && nightDuration >= 11) ?
-                        `ساعة `
-                        : `ساعات `
+                        ` ساعة `
+                        : ` ساعات `
                     )
                 } 
                 {(minsDuration && minsDuration > 0) ?
                     `و ` +  Math.floor(minsDuration) + ` دقيقة`
                     : null
                 }
+                </span>
             
             </h2>
         </>

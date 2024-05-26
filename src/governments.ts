@@ -2,7 +2,7 @@ export const egyptGovernorates = [
     { "name": "القاهرة", "url": "cairo" },
     { "name": "الإسماعيلية", "url": "ismailia" },
     { "name": "الجيزة", "url": "giza" },
-    { "name": "الأسكندرية", "url": "alexandria" },
+    { "name": "الإسكندرية", "url": "alexandria" },
     { "name": "الدقهلية", "url": "dakahlia" },
     { "name": "البحيرة", "url": "beheira" },
     { "name": "الفيوم", "url": "fayoum" },

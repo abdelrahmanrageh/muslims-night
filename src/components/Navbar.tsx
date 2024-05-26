@@ -6,7 +6,7 @@ export default function Navbar() {
 
     return (
         <nav>
-            <div className=" sm:px-8 px-3 py-5 flex justify-between items-center  bg-navy text-gold">
+            <div className=" sm:px-8 px-3 py-5 flex justify-between items-center  bg-navy text-gold z-5">
                 <div className="flex">
                     <Link to={'/'}>
                         <img src={logoPng} alt="logo" className="inline ml-4 h-8 sm:h-10"/>
@@ -15,8 +15,8 @@ export default function Navbar() {
                 </div>
                 <div>
                     {(location.pathname === '/manual-calculation')
-                        ? <Link to={'/'} className="h-8 sm:h-10 py-2 px-4  rounded-lg bg-gold text-navy text-xs sm:text-lg">الرئيسية</Link>
-                        : <Link to={'/manual-calculation'} className="h-8 sm:h-10 py-2 px-4  rounded-lg bg-gold text-navy text-xs sm:text-lg">الحساب يدويََا</Link>
+                        ? <Link to={'/'} className="h-8 sm:h-10 py-2 px-4  rounded-lg bg-gold text-navy text-xs sm:text-lg hover:bg-orange-50 transition-all">الرئيسية</Link>
+                        : <Link to={'/manual-calculation'} className="h-8 sm:h-10 py-2 px-4  rounded-lg bg-gold text-navy text-xs sm:text-lg hover:bg-orange-50  transition-all">الحساب يدويََا</Link>
                     }
                 </div>
             </div>
