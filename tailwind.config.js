@@ -6,7 +6,7 @@ export default {
   ],
   theme: {
     extend: {
-      colors: {
+      colors: { 
         'navy': '#1b2846',
         'gold': '#ffedd0'
       }
